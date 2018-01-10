@@ -18,20 +18,21 @@ function priceUpdate($ID, &$arFields)
 }
 
 function sendEmail($ID, $IBLOCK_ID, $emailStatus, $site, $emailnum, $price) {
-	$arSelect = Array("ID", "IBLOCK_ID", "NAME", "PROPERTY_USER_EMAIL", "PROPERTY_PRODUCT_ID");
-	$arFilter = Array("IBLOCK_ID"			=> IntVal($IBLOCK_ID), 
+	$res 		= CIBlockElement::GetByID($ID);
+	
+	$arSelect 	= Array("ID", "IBLOCK_ID", "NAME", "PROPERTY_USER_EMAIL", "PROPERTY_PRODUCT_ID");
+	$arFilter 	= Array("IBLOCK_ID"			=> IntVal($IBLOCK_ID), 
 					  "ACTIVE"				=> "Y", 
 					  "PROPERTY_PRODUCT_ID" => IntVal($ID),					  
 					 );					  
 					  
-	$res = CIBlockElement::GetList(Array(), $arFilter, false, Array("nPageSize" => 50), $arSelect);
-	while($ob = $res->GetNextElement())
+	$res 		= CIBlockElement::GetList(Array(), $arFilter, false, Array("nPageSize" => 50), $arSelect);
+	while($ob 	= $res->GetNextElement())
 	{
 		$arFields 									= $ob->GetFields();
 		if ($ID = $arFields["PROPERTY_PRODUCT_ID"]) { 
 			$arEventFields 							= array();
-		
-			$res 									= CIBlockElement::GetByID($ID);
+					
 			if($ar_res 								= $res->GetNext()) {		
 				$arEventFields["ID"] 				= $ID;
 				$arEventFields["EMAIL"] 			= $arFields["PROPERTY_USER_EMAIL"];
