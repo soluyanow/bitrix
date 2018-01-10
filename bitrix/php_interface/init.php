@@ -43,7 +43,7 @@ function sendEmail($ID, $IBLOCK_ID, $emailStatus, $site, $emailnum, $price) {
 			
 			CEvent::SendImmediate($emailStatus, $site, $arEventFields, "N", $emailnum);
 			
-			removeSubscribe($arFields["PROPERTY_PRODUCT_ID_VALUE"]);
+			removeSubscribe($arFields["ID"]);
 		}
 	}	
 }
