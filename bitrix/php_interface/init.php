@@ -13,26 +13,39 @@ function priceUpdate($ID, &$arFields)
 	$curPrice = getPrice($ID);
 	
 	if ($curPrice < $GLOGALS['prevPrice']) {
-		sendEmail($ID, "PRICE_UPDATE", "s1", 159, $curPrice);
-		removeSubscribe($ID);
+		sendEmail($ID, 4, "PRICE_UPDATE", "s1", 159, $curPrice);		
 	}
 }
 
-function sendEmail($ID, $emailStatus, $site, $emailnum, $price) {
+function sendEmail($ID, $IBLOCK_ID, $emailStatus, $site, $emailnum, $price) {
+	$arSelect = Array("ID", "IBLOCK_ID", "NAME", "PROPERTY_USER_EMAIL_VALUE", "PROPERTY_PRODUCT_ID_VALUE");
+	$arFilter = Array("IBLOCK_ID"			=> IntVal($IBLOCK_ID), 
+					  "ACTIVE"				=> "Y", 
+					  "PROPERTY_PRODUCT_ID" => IntVal($ID),					  
+					 );					  
+					  
+	$res = CIBlockElement::GetList(Array(), $arFilter, false, Array("nPageSize" => 50), $arSelect);
+	while($ob = $res->GetNextElement())
+	{
+		$arFields 									= $ob->GetFields();
+		if ($ID = $arFields["PROPERTY_PRODUCT_ID_VALUE"]) { 
+			$arEventFields 							= array();
 		
-	$arEventFields 							= array();
-	
-	$res 									= CIBlockElement::GetByID($ID);
-	if($ar_res 								= $res->GetNext()) {		
-		$arEventFields["ID"] 				= $ID;
-		$arEventFields["EMAIL"] 			= $USER->GetEmail();
-		$arEventFields["NAME"] 				= $ar_res['NAME'];
-		$arEventFields["ARTNUMBER"] 		= getProdValues(2, $ID, 'ARTNUMBER');
-		$arEventFields["CURRENT_PRICE"] 	= $price;
-		$arEventFields["DETAIL_PAGE_URL"] 	= $ar_res['DETAIL_PAGE_URL'];	
+			$res 									= CIBlockElement::GetByID($ID);
+			if($ar_res 								= $res->GetNext()) {		
+				$arEventFields["ID"] 				= $ID;
+				$arEventFields["EMAIL"] 			= $arFields["PROPERTY_USER_EMAIL_VALUE"];
+				$arEventFields["NAME"] 				= $ar_res["NAME"];
+				$arEventFields["ARTNUMBER"] 		= getProdValues(2, $ID, "ARTNUMBER");
+				$arEventFields["CURRENT_PRICE"] 	= $price;
+				$arEventFields["DETAIL_PAGE_URL"] 	= $ar_res["DETAIL_PAGE_URL"];	
+			}	
+			
+			CEvent::SendImmediate($emailStatus, $site, $arEventFields, "N", $emailnum);
+			
+			removeSubscribe($arFields["PROPERTY_PRODUCT_ID_VALUE"]);
+		}
 	}	
-	
-	CEvent::SendImmediate($emailStatus, $site, $arEventFields, "N", $emailnum);
 }
 
 function getPrice($ID) {
@@ -62,7 +75,7 @@ function getProdValues($ibID, $ID, $valName) {
 	return false;
 }
 
-function removeSubscribe($IBLOCK_ID, $ID) {
+function removeSubscribe($ID) {
 	CIBlockElement::Delete($ID);	
 }
 ?>
