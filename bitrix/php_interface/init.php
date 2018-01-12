@@ -95,16 +95,6 @@ function getPrice($ID) {
 	return false;
 }
 
-function getProdValues($ibID, $ID, $valName) {
-	$db_props = CIBlockElement::GetProperty($ibID, $ID, array("sort" => "asc"), Array("CODE"=>$valName));
-	if($ar_props = $db_props->Fetch()) {
-		return $ar_props["VALUE"];
-	} else {
-		return false;
-	}	
-	return false;
-}
-
 function removeSubscribe($subscribeID) {
 	CIBlockElement::Delete($subscribeID);	
 }
