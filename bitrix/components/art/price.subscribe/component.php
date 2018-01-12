@@ -1,6 +1,22 @@
 <?if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true) die();?>
 
 <?if (!empty($_REQUEST['email'])) {
+	/*
+	iblock fields
+	NAME, 
+	USER_EMAIL,
+	USER_LOGIN,
+	MAIL_EVENT_ID,
+	PRODUCT_IBLOCK_ID,
+	PRODUCT_ID,
+	PRODUCT_NAME,
+	PRODUCT_ARTICLE,
+	PRODUCT_LINK
+	
+	product iblock fields
+	MAIL_SUBSCRIBE_IBLOCK_ID
+	*/	
+	
 	$arResult = Array(
 		'USER_NAME' 						=> $_REQUEST['username'],
 		'USER_EMAIL' 						=> $_REQUEST['email'],
@@ -24,7 +40,7 @@
 					  "PROPERTY_USER_EMAIL" => $arResult['USER_EMAIL']
 					 );					  
 					  
-	$res = CIBlockElement::GetList(Array(), $arFilter, false, Array("nPageSize" => 50), $arSelect);
+	$res = CIBlockElement::GetList(Array(), $arFilter, false, Array(), $arSelect);
 	while($ob = $res->GetNextElement())
 	{
 		$arFields 							= $ob->GetFields();
@@ -43,7 +59,11 @@
 		$propVals['USER_EMAIL'] 			= $arResult['USER_EMAIL'];		
 		$propVals['PRODUCT_ID'] 			= $arResult['PRODUCT_ID'];
 		$propVals['PRODUCT_IBLOCK_ID'] 		= $arResult['PRODUCT_IBLOCK_ID'];		
-			
+		$propVals['MAIL_EVENT_ID'] 			= $arResult['MAIL_EVENT_ID'];
+		$propVals['PRODUCT_NAME'] 			= $arResult['PRODUCT_NAME'];
+		$propVals['PRODUCT_ARTICLE'] 		= $arResult['PRODUCT_ARTICLE'];
+		$propVals['PRODUCT_LINK'] 			= $arResult['PRODUCT_LINK'];			
+		
 		$propArray['PROPERTY_VALUES'] 		= $propVals;		
 		
 		$el->Add($propArray);
