@@ -9,15 +9,13 @@ function BeforePriceUpdate($ID, &$arFields)
 
 AddEventHandler("catalog", "OnPriceUpdate", "PriceUpdate"); 
 function priceUpdate($ID, &$arFields) {
-	define("SITE_ID", "s1");
-	
 	$fields 						= array();
 	
 	$el 							= CIBlockElement::GetByID($ID);
 	$element 						= $el->getNext();
 	
 	if (!empty($element)) {
-		$arSelect 					= Array("ID", "IBLOCK_ID", "NAME", "PROPERTY_MAIL_SUBSCRIBE_IBLOCK_ID");
+		$arSelect 					= Array("ID", "IBLOCK_ID", "LID", "NAME", "PROPERTY_MAIL_SUBSCRIBE_IBLOCK_ID");
 		$arFilter 					= Array("ID" 				=> IntVal($element["ID"]),
 											"IBLOCK_ID"			=> IntVal($element["IBLOCK_ID"]), 							  
 											"ACTIVE"			=> "Y" 							  
@@ -29,7 +27,7 @@ function priceUpdate($ID, &$arFields) {
 		}	
 		
 		$curPrice 					= getPrice($ID);
-		$fields["SITE_ID"] 			= SITE_ID;
+		$fields["SITE_ID"] 			= $fields["LID"];
 		$fields["PRODUCT_ID"] 		= IntVal($ID);
 		$fields["PRODUCT_PRICE"] 	= $curPrice;		
 		
