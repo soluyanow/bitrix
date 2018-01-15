@@ -9,30 +9,36 @@ function BeforePriceUpdate($ID, &$arFields)
 
 AddEventHandler("catalog", "OnPriceUpdate", "PriceUpdate"); 
 function priceUpdate($ID, &$arFields) {
-	$fields 						= array();
+	define("MAIL_EVENT_ID"				, 159);
+	define("MAIL_SUBSCRIBE_IBLOCK_ID"	, 4);
+	
+	$resFields 						= array();
+	$fields							= array();
 	
 	$el 							= CIBlockElement::GetByID($ID);
 	$element 						= $el->getNext();
 	
 	if (!empty($element)) {
-		$arSelect 					= Array("ID", "IBLOCK_ID", "LID", "NAME", "PROPERTY_MAIL_SUBSCRIBE_IBLOCK_ID");
+		$arSelect 					= Array("ID", "IBLOCK_ID", "LID", "NAME");
 		$arFilter 					= Array("ID" 				=> IntVal($element["ID"]),
 											"IBLOCK_ID"			=> IntVal($element["IBLOCK_ID"]), 							  
 											"ACTIVE"			=> "Y" 							  
 											);					  
-						  
+
 		$res 						= CIBlockElement::GetList(Array(), $arFilter, false, Array(), $arSelect);
 		while($ob 					= $res->GetNextElement()) {
 			$fields 				= $ob->getFields();	
 		}	
 		
-		$curPrice 					= getPrice($ID);
-		$fields["SITE_ID"] 			= $fields["LID"];
-		$fields["PRODUCT_ID"] 		= IntVal($ID);
-		$fields["PRODUCT_PRICE"] 	= $curPrice;		
+		$curPrice 					= getPrice($fields["ID"]);
+		$resFields["SITE_ID"] 		= $fields["LID"];
+		$resFields["PRODUCT_ID"] 	= $fields["ID"];
+		$resFields["PRODUCT_PRICE"] = $curPrice;
+		$resFields["MAIL_EVENT_ID"]	= MAIL_EVENT_ID;
+		$resFields["MAIL_SUBSCRIBE_IBLOCK_ID"]	= MAIL_SUBSCRIBE_IBLOCK_ID;
 		
-		if (($curPrice < $GLOGALS['prevPrice']) && !empty($fields)) {
-			sendEmail($fields);		
+		if (($curPrice < $GLOGALS['prevPrice']) && !empty($resFields)) {
+			sendEmail($resFields);		
 		}
 	}
 }
@@ -43,13 +49,13 @@ function sendEmail($fields) {
 	
 	if (!empty($fields)) {
 		$arSelect 		= Array("ID", "IBLOCK_ID", "NAME", "PROPERTY_USER_EMAIL", "PROPERTY_PRODUCT_ID", "PROPERTY_USER_LOGIN", 
-								"PROPERTY_MAIL_EVENT_ID", "PROPERTY_PRODUCT_IBLOCK_ID", "PROPERTY_PRODUCT_ID", "PROPERTY_PRODUCT_NAME",
+								"PROPERTY_PRODUCT_IBLOCK_ID", "PROPERTY_PRODUCT_ID", "PROPERTY_PRODUCT_NAME",
 								"PROPERTY_PRODUCT_ARTICLE", "PROPERTY_PRODUCT_LINK");
 			
-		$arFilter 		= Array("IBLOCK_ID"				=> IntVal($fields["PROPERTY_MAIL_SUBSCRIBE_IBLOCK_ID_VALUE"]),
+		$arFilter 		= Array("IBLOCK_ID"				=> $fields["MAIL_SUBSCRIBE_IBLOCK_ID"],
 								"PROPERTY_PRODUCT_ID"	=> $fields["PRODUCT_ID"],
 								"ACTIVE"				=> "Y"
-								);					 
+								);
 				
 		$res = CIBlockElement::GetList(Array(), $arFilter, false, Array(), $arSelect);				
 		while($ob 		= $res->GetNextElement()) {					
@@ -68,8 +74,8 @@ function sendEmail($fields) {
 				}
 			}
 				
-			if (!empty($arEventFields) && !empty($mail["PROPERTY_MAIL_EVENT_ID_VALUE"])) {
-				CEvent::Send($mail["PROPERTY_PRODUCT_ID_VALUE"], $fields["SITE_ID"], $arEventFields, "N");
+			if (!empty($arEventFields) && !empty($fields["MAIL_EVENT_ID"])) {
+				CEvent::Send($fields["MAIL_EVENT_ID"], $fields["SITE_ID"], $arEventFields, "N");
 				removeSubscribe($mail["ID"]);
 			}
 		}
