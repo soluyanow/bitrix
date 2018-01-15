@@ -5,16 +5,12 @@
 	iblock fields
 	NAME, 
 	USER_EMAIL,
-	USER_LOGIN,
-	MAIL_EVENT_ID,
+	USER_LOGIN,	
 	PRODUCT_IBLOCK_ID,
 	PRODUCT_ID,
 	PRODUCT_NAME,
 	PRODUCT_ARTICLE,
 	PRODUCT_LINK
-	
-	product iblock fields
-	MAIL_SUBSCRIBE_IBLOCK_ID
 	*/	
 	
 	$arResult = Array(
@@ -59,7 +55,6 @@
 		$propVals['USER_EMAIL'] 			= $arResult['USER_EMAIL'];		
 		$propVals['PRODUCT_ID'] 			= $arResult['PRODUCT_ID'];
 		$propVals['PRODUCT_IBLOCK_ID'] 		= $arResult['PRODUCT_IBLOCK_ID'];		
-		$propVals['MAIL_EVENT_ID'] 			= $arResult['MAIL_EVENT_ID'];
 		$propVals['PRODUCT_NAME'] 			= $arResult['PRODUCT_NAME'];
 		$propVals['PRODUCT_ARTICLE'] 		= $arResult['PRODUCT_ARTICLE'];
 		$propVals['PRODUCT_LINK'] 			= $arResult['PRODUCT_LINK'];			
